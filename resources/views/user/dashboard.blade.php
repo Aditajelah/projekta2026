@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard</title>
+    <title>Member Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -238,7 +238,7 @@
 </head>
 <body>
     <nav>
-        <h2>✈️ Travel Guide</h2>
+        <h2>Travel Guide</h2>
         <div class="nav-buttons">
             <span style="color: white; margin-right: 20px; font-weight: 600;">
                 {{ Auth::user()->username }}
@@ -253,7 +253,7 @@
     <div class="container">
         <!-- Dashboard Header -->
         <div class="dashboard-header">
-            <h1>Selamat Datang, {{ Auth::user()->username }}! 👋</h1>
+            <h1>Selamat Datang, {{ Auth::user()->username }}!</h1>
             <p>Jelajahi destinasi, kuliner, dan penginapan terbaik bersama kami</p>
 
             <div class="user-info">
@@ -269,7 +269,7 @@
                     </div>
                     <div class="info-item">
                         <div class="info-label">Status Akun</div>
-                        <div class="info-value">✓ Aktif</div>
+                        <div class="info-value">Aktif</div>
                     </div>
                     <div class="info-item">
                         <div class="info-label">Bergabung Sejak</div>
@@ -281,7 +281,7 @@
 
         <!-- Welcome Message -->
         <div class="welcome-message">
-            <h4>📢 Selamat Datang di Travel Guide!</h4>
+            <h4>Selamat Datang di Travel Guide!</h4>
             <p>
                 Website ini adalah panduan terbaik untuk menemukan destinasi wisata impian, kuliner lezat, 
                 dan penginapan nyaman di berbagai daerah. Mulai jelajahi sekarang dan temukan pengalaman 
@@ -291,20 +291,20 @@
 
         <!-- Quick Links Section -->
         <div class="content-section">
-            <h2>🚀 Mulai Jelajahi</h2>
+            <h2>Mulai Jelajahi</h2>
             <div class="quick-links">
                 <a href="#" class="quick-link-card">
-                    <div class="quick-link-icon">📍</div>
+                    <div class="quick-link-icon">Dest</div>
                     <h3>Destinasi Wisata</h3>
                     <p>Jelajahi destinasi wisata terbaik</p>
                 </a>
                 <a href="#" class="quick-link-card">
-                    <div class="quick-link-icon">🍽️</div>
+                    <div class="quick-link-icon">Kul</div>
                     <h3>Rekomendasi Kuliner</h3>
                     <p>Temukan makanan lezat terbaik</p>
                 </a>
                 <a href="#" class="quick-link-card">
-                    <div class="quick-link-icon">🏨</div>
+                    <div class="quick-link-icon">Inn</div>
                     <h3>Penginapan Nyaman</h3>
                     <p>Cari tempat menginap terbaik</p>
                 </a>
@@ -313,23 +313,23 @@
 
         <!-- Recent Activity Section -->
         <div class="content-section">
-            <h2>📊 Aktivitas Terakhir</h2>
+            <h2>Aktivitas Terakhir</h2>
             <div class="activity-item">
-                <div class="activity-icon">👤</div>
+                <div class="activity-icon">Akun</div>
                 <div class="activity-content">
                     <h4>Akun Anda Dibuat</h4>
                     <p>{{ Auth::user()->created_at->format('d M Y \p\u006Bl H:i') }}</p>
                 </div>
             </div>
             <div class="activity-item">
-                <div class="activity-icon">✅</div>
+                <div class="activity-icon">OK</div>
                 <div class="activity-content">
                     <h4>Email Terverifikasi</h4>
                     <p>Akun Anda telah diaktifkan dan siap digunakan</p>
                 </div>
             </div>
             <div class="activity-item">
-                <div class="activity-icon">🎯</div>
+                <div class="activity-icon">Go</div>
                 <div class="activity-content">
                     <h4>Siap untuk Dijelajahi</h4>
                     <p>Mulai jelajahi destinasi dan kuliner favorit Anda sekarang!</p>

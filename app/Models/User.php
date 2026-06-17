@@ -23,6 +23,10 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'warning_count',
+        'is_active',
+        'deactivation_reason_code',
+        'deactivation_reason_detail',
     ];
 
     /**
@@ -45,6 +49,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'warning_count' => 'integer',
+            'is_active' => 'boolean',
         ];
     }
 

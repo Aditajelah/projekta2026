@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -174,7 +174,7 @@
 </head>
 <body>
     <nav>
-        <h2>🏖️ Travel & Food Guide</h2>
+        <h2>Travel & Food Guide</h2>
         <div class="nav-buttons">
             <span style="color: white; font-weight: 600;">
                 Selamat datang, {{ Auth::user()->username }}!
@@ -216,14 +216,14 @@
 
         @if (Auth::user()->is_comment_blocked)
             <div class="alert alert-warning">
-                <strong>⚠️ Akun Anda Diblokir</strong><br>
+                <strong>Akun Anda Diblokir</strong><br>
                 Anda saat ini tidak dapat memberikan komentar.<br>
                 <strong>Alasan:</strong> {{ Auth::user()->comment_blocked_reason }}<br>
                 <strong>Diblokir pada:</strong> {{ Auth::user()->comment_blocked_at->format('d M Y H:i') }}
             </div>
         @else
             <div class="alert alert-success">
-                ✓ Akun Anda aktif dan dapat memberikan komentar.
+                Akun Anda aktif dan dapat memberikan komentar.
             </div>
         @endif
 
@@ -231,34 +231,34 @@
 
         <div class="feature-list">
             <div class="feature-card">
-                <h3>📍 Jelajahi Destinasi</h3>
-                <p>Temukan destinasi wisata terbaik dan hidden gem di berbagai daerah dengan rating dan review dari user lain.</p>
+                <h3>Jelajahi Destinasi</h3>
+                <p>Temukan destinasi wisata terbaik dan hidden gem di berbagai daerah dengan rating dan review dari member lain.</p>
                 <a href="{{ route('explore.destinations') }}" class="btn-link">Lihat Destinasi</a>
             </div>
 
             <div class="feature-card">
-                <h3>🍽️ Rekomendasi Kuliner</h3>
+                <h3>Rekomendasi Kuliner</h3>
                 <p>Cari tempat makan terbaik berdasarkan kategori dan nikmati pengalaman kuliner yang tak terlupakan.</p>
                 <a href="{{ route('explore.culinaries') }}" class="btn-link">Lihat Kuliner</a>
             </div>
 
             <div class="feature-card">
-                <h3>🏨 Akomodasi Menginap</h3>
+                <h3>Akomodasi Menginap</h3>
                 <p>Temukan penginapan terbaik dengan harga terjangkau dan fasilitas lengkap untuk perjalanan Anda.</p>
                 <a href="{{ route('explore.stays') }}" class="btn-link">Lihat Penginapan</a>
             </div>
 
             <div class="feature-card">
-                <h3>🔖 Bookmark Favorit</h3>
+                <h3>Bookmark Favorit</h3>
                 <p>Simpan tempat favorit Anda dan buka lagi kapan saja dari satu halaman khusus favorit.</p>
                 <a href="{{ route('bookmarks.index') }}" class="btn-link">Lihat Bookmark</a>
             </div>
 
             <div class="feature-card">
-                <h3>💬 Berikan Komentar</h3>
+                <h3>Berikan Komentar</h3>
                 <p>Bagikan pengalaman Anda melalui komentar dan review untuk membantu traveler lain.</p>
                 @if (Auth::user()->is_comment_blocked)
-                    <span style="color: #d9534f; font-size: 14px;">⚠️ Akun Anda tidak dapat memberikan komentar</span>
+                    <span style="color: #d9534f; font-size: 14px;">Akun Anda tidak dapat memberikan komentar</span>
                 @else
                     <a href="#" class="btn-link">Tulis Komentar</a>
                 @endif

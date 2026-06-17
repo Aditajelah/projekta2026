@@ -19,6 +19,7 @@ class Destination extends Model
         'longitude',
         'operational_days',
         'operational_hours',
+        'operational_schedule',
         'transport_modes',
         'price',
         'rating',
@@ -29,6 +30,7 @@ class Destination extends Model
     ];
 
     protected $casts = [
+        'operational_schedule' => 'array',
         'transport_modes' => 'array',
     ];
 

@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExploreController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\BookmarkController;
+use App\Http\Controllers\CustomerServiceController;
 use App\Http\Controllers\RatingController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +19,7 @@ Route::post('/register', [AuthController::class, 'register']);
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/customer-service', [CustomerServiceController::class, 'index'])->name('customer-service');
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
@@ -27,8 +29,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'adminDashboard'])->name('admin.dashboard');
     Route::get('/admin/places', [DashboardController::class, 'managePlaces'])->name('admin.places.index');
     Route::get('/admin/comments', [AdminDataController::class, 'comments'])->name('admin.comments.index');
+    Route::delete('/admin/comments/{comment}', [AdminDataController::class, 'destroyComment'])->name('admin.comments.destroy');
+    Route::post('/admin/comments/{comment}/warning', [AdminDataController::class, 'sendWarning'])->name('admin.comments.warning');
     Route::get('/admin/users', [AdminUserController::class, 'index'])->name('admin.users.index');
     Route::post('/admin/users', [AdminUserController::class, 'store'])->name('admin.users.store');
+    Route::post('/admin/users/{user}/reset-password', [AdminUserController::class, 'resetPassword'])->name('admin.users.reset-password');
+    Route::post('/admin/users/{user}/status', [AdminUserController::class, 'updateStatus'])->name('admin.users.update-status');
     Route::get('/admin/logs', [AdminDataController::class, 'logs'])->name('admin.logs');
     Route::get('/user/dashboard', [DashboardController::class, 'userDashboard'])->name('user.dashboard');
 

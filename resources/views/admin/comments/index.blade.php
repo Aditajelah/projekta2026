@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -96,6 +96,24 @@
             padding: 20px;
         }
 
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 14px;
+        }
+
+        .alert-error {
+            background: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 14px;
+        }
+
         .search-input {
             width: 100%;
             max-width: 380px;
@@ -174,6 +192,53 @@
             color: #6b7280;
         }
 
+        .actions {
+            min-width: 180px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .btn {
+            width: 100%;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: #111827;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+            color: #fff;
+        }
+
+        .btn:disabled {
+            background: #d1d5db;
+            color: #6b7280;
+            cursor: not-allowed;
+        }
+
+        .warning-count {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
         @media (max-width: 980px) {
             .layout {
                 flex-direction: column;
@@ -197,7 +262,7 @@
                 <a href="{{ route('admin.dashboard') }}">Home</a>
                 <a href="{{ route('admin.places.index') }}">Manage Tempat</a>
                 <a href="{{ route('admin.comments.index') }}" class="active">Manage Komentar</a>
-                <a href="{{ route('admin.users.index') }}">Manage User</a>
+                <a href="{{ route('admin.users.index') }}">Manage Member</a>
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
                     <button type="submit">Logout</button>
@@ -212,18 +277,27 @@
             </div>
 
             <div class="card">
+                @if(session('success'))
+                    <div class="alert-success">{{ session('success') }}</div>
+                @endif
+
+                @if($errors->has('warning'))
+                    <div class="alert-error">{{ $errors->first('warning') }}</div>
+                @endif
+
                 @if($comments->count() > 0)
-                    <input class="search-input" id="comment-search" type="text" placeholder="Cari komentar, user, atau nama tempat...">
+                    <input class="search-input" id="comment-search" type="text" placeholder="Cari komentar, member, atau nama tempat...">
                     <div class="table-scroll">
                         <table id="comments-table">
                             <thead>
                                 <tr>
-                                    <th>User</th>
+                                    <th>Member</th>
                                     <th>Tipe Tempat</th>
                                     <th>Nama Tempat</th>
                                     <th>Rating</th>
                                     <th>Komentar</th>
                                     <th>Dibuat</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -232,20 +306,43 @@
                                         $rateable = $comment->rateable;
                                         $placeName = $rateable?->name ?? '-';
                                         $type = class_basename($comment->rateable_type);
+                                        $warningCount = (int) ($comment->user->warning_count ?? 0);
+                                        $maxReached = $warningCount >= $maxWarningCount;
                                     @endphp
                                     <tr>
-                                        <td>{{ $comment->user->username ?? 'User tidak ditemukan' }}</td>
+                                        <td>{{ $comment->user->username ?? 'Member tidak ditemukan' }}</td>
                                         <td>{{ $type }}</td>
                                         <td>{{ $placeName }}</td>
                                         <td>
                                             @if(!is_null($comment->rating))
-                                                <span class="rating-badge">⭐ {{ $comment->rating }}</span>
+                                                <span class="rating-badge">* {{ $comment->rating }}</span>
                                             @else
                                                 <span class="muted">-</span>
                                             @endif
                                         </td>
                                         <td class="comment-text">{{ $comment->review }}</td>
                                         <td>{{ $comment->created_at?->format('d M Y H:i') }}</td>
+                                        <td>
+                                            <div class="actions">
+                                                <form action="{{ route('admin.comments.destroy', $comment) }}" method="POST" onsubmit="return confirm('Yakin hapus komentar ini?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger">Hapus Komentar</button>
+                                                </form>
+
+                                                @if($comment->user)
+                                                    <form action="{{ route('admin.comments.warning', $comment) }}" method="POST">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-warning" {{ $maxReached ? 'disabled' : '' }}>
+                                                            Kirim Peringatan
+                                                        </button>
+                                                    </form>
+                                                    <div class="warning-count">Peringatan: {{ $warningCount }}/{{ $maxWarningCount }}</div>
+                                                @else
+                                                    <div class="warning-count">Peringatan: -</div>
+                                                @endif
+                                            </div>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -257,7 +354,7 @@
                         {{ $comments->links() }}
                     </div>
                 @else
-                    <div class="empty-message">Belum ada komentar dari user.</div>
+                    <div class="empty-message">Belum ada komentar dari member.</div>
                 @endif
             </div>
         </main>

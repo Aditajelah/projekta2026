@@ -5,27 +5,107 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $isEdit ? 'Edit Penginapan' : 'Tambah Penginapan' }}</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f5f5f5; margin:0; }
-        .container { max-width: 900px; margin: 30px auto; background:#fff; padding: 24px; border-radius: 10px; box-shadow: 0 3px 12px rgba(0,0,0,.08); }
-        h1 { margin-top:0; color:#333; }
-        .grid { display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+        :root {
+            --bg-start: #f7f4ef;
+            --bg-end: #eef5ff;
+            --card: rgba(255, 255, 255, 0.9);
+            --border: rgba(15, 23, 42, 0.08);
+            --text: #102033;
+            --muted: #607086;
+            --primary: #0ea5e9;
+            --success: #15803d;
+            --danger: #b42318;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+            margin: 0;
+            color: var(--text);
+        }
+        .page-shell { max-width: 1100px; margin: 28px auto; padding: 0 18px 28px; }
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.9fr);
+            gap: 18px;
+            align-items: stretch;
+            margin-bottom: 18px;
+        }
+        .hero-card, .form-card, .photo-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+            backdrop-filter: blur(14px);
+        }
+        .hero-card { padding: 26px; }
+        .eyebrow { display:inline-flex; margin:0 0 14px; padding:7px 12px; border-radius:999px; background:rgba(14,165,233,.08); color:var(--primary); font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+        h1 { margin:0; font-size:34px; line-height:1.15; }
+        .subtitle { margin:12px 0 0; color:var(--muted); line-height:1.6; max-width:60ch; }
+        .meta-row { display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+        .meta-pill { padding:9px 12px; border-radius:999px; background:rgba(15,23,42,.05); color:var(--text); font-size:13px; font-weight:600; }
+        .photo-card { overflow:hidden; }
+        .photo-card .photo-head { display:flex; justify-content:space-between; align-items:center; padding:18px 18px 0; color:var(--muted); font-size:13px; font-weight:600; }
+        .photo-preview { width:100%; height:290px; object-fit:cover; display:block; margin-top:14px; }
+        .photo-placeholder { min-height:290px; display:flex; align-items:center; justify-content:center; padding:24px; text-align:center; color:var(--muted); background:linear-gradient(135deg, rgba(14,165,233,.08), rgba(29,78,216,.08)); }
+        .photo-note { margin:0; padding:14px 18px 18px; color:var(--muted); font-size:13px; }
+        .form-card { padding: 24px; }
+        .section-title { margin: 0 0 4px; font-size: 18px; }
+        .section-subtitle { margin: 0 0 18px; color: var(--muted); font-size: 14px; }
+        .grid { display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:16px; }
         .full { grid-column: 1 / -1; }
-        label { display:block; font-weight:600; margin-bottom:6px; color:#444; }
-        input, textarea, select { width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; }
-        textarea { min-height:120px; }
-        .actions { margin-top:20px; display:flex; gap:10px; }
-        .btn { padding:10px 14px; border:none; border-radius:6px; cursor:pointer; text-decoration:none; font-weight:600; }
-        .btn-save { background:#27ae60; color:#fff; }
-        .btn-back { background:#95a5a6; color:#fff; }
-        .errors { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; padding:12px; border-radius:6px; margin-bottom:16px; }
-        .checkbox-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:8px 14px; }
-        .checkbox-grid label { display:flex; align-items:center; gap:8px; font-weight:500; margin:0; }
+        label { display:block; font-weight:700; margin-bottom:8px; color: var(--text); }
+        input, textarea, select { width:100%; padding:12px 14px; border:1px solid #d8e0ea; border-radius:14px; background:#fff; color: var(--text); transition: border-color .2s ease, box-shadow .2s ease; }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: rgba(14,165,233,0.5); box-shadow: 0 0 0 4px rgba(14,165,233,0.08); }
+        textarea { min-height:130px; resize: vertical; }
+        .field-card { padding: 16px; border: 1px solid #e5ebf2; border-radius: 18px; background: rgba(255, 255, 255, 0.74); }
+        .actions { margin-top:24px; display:flex; gap:12px; flex-wrap:wrap; }
+        .btn { padding:12px 16px; border:none; border-radius:12px; cursor:pointer; text-decoration:none; font-weight:700; }
+        .btn-save { background: linear-gradient(135deg, var(--success), #22c55e); color:#fff; }
+        .btn-back { background:#e2e8f0; color: var(--text); }
+        .errors { background:#fff1f2; color:var(--danger); border:1px solid #fecdd3; padding:14px 16px; border-radius:14px; margin-bottom:16px; }
+        .errors ul { margin:0; padding-left:18px; }
+        .checkbox-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap:10px 14px; }
+        .checkbox-grid label { display:flex; align-items:center; gap:8px; font-weight:600; margin:0; }
         .checkbox-grid input { width:auto; }
+        .helper-text { margin-top: 8px; color: var(--muted); font-size: 13px; }
+        @media (max-width: 860px) {
+            .hero, .grid { grid-template-columns: 1fr; }
+            .hero-card { order: 1; }
+            .photo-card { order: -1; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>{{ $isEdit ? 'Edit Penginapan' : 'Tambah Penginapan' }}</h1>
+    @php
+        $stayImage = !empty($stay->image_url) ? asset('storage/' . $stay->image_url) : null;
+    @endphp
+    <div class="page-shell">
+        <div class="hero">
+            <div class="hero-card">
+                <p class="eyebrow">Admin Tempat</p>
+                <h1>{{ $isEdit ? 'Edit Penginapan' : 'Tambah Penginapan' }}</h1>
+                <p class="subtitle">Kelola data penginapan dengan tata letak yang lebih modern, lengkap dengan kartu foto utama di bagian atas.</p>
+                <div class="meta-row">
+                    <span class="meta-pill">Penginapan</span>
+                    <span class="meta-pill">Amenities & harga</span>
+                    <span class="meta-pill">Foto utama di atas</span>
+                </div>
+            </div>
+            <div class="photo-card">
+                <div class="photo-head">
+                    <span>Foto utama penginapan</span>
+                    <span>{{ $isEdit ? 'Preview saat ini' : 'Belum diunggah' }}</span>
+                </div>
+                @if($stayImage)
+                    <img src="{{ $stayImage }}" alt="Foto Penginapan" class="photo-preview">
+                    <p class="photo-note">Foto aktif yang tersimpan saat ini.</p>
+                @else
+                    <div class="photo-placeholder">Belum ada foto penginapan. Upload gambar agar detail lebih menarik.</div>
+                @endif
+            </div>
+        </div>
 
         @if ($errors->any())
             <div class="errors">
@@ -43,60 +123,36 @@
                 @method('PUT')
             @endif
 
-            <div class="grid">
-                <div>
+            <div class="form-card">
+                <h2 class="section-title">Detail penginapan</h2>
+                <p class="section-subtitle">Isi data lokasi, fasilitas, jadwal, dan foto pendukung pada satu halaman yang lebih terstruktur.</p>
+                <div class="grid">
+                <div class="field-card">
                     <label>Nama</label>
                     <input type="text" name="name" value="{{ old('name', $stay->name) }}" required>
                 </div>
-                <div>
+                <div class="field-card">
                     <label>Alamat Tempat</label>
                     <input type="text" name="place_address" value="{{ old('place_address', $stay->place_address) }}" required>
                 </div>
-                <div>
+                <div class="field-card">
                     <label>Kota/Kabupaten</label>
                     <input type="text" name="city" placeholder="Contoh: Kota Bandung / Kabupaten Sleman" value="{{ old('city', $stay->city) }}" required>
                 </div>
-                <div>
+                <div class="field-card">
                     <label>Provinsi</label>
                     <input type="text" name="province" value="{{ old('province', $stay->province) }}" required>
                 </div>
-                <div>
+                <div class="field-card">
                     <label>Latitude</label>
                     <input type="number" step="0.0000001" name="latitude" value="{{ old('latitude', $stay->latitude) }}">
                 </div>
-                <div>
+                <div class="field-card">
                     <label>Longitude</label>
                     <input type="number" step="0.0000001" name="longitude" value="{{ old('longitude', $stay->longitude) }}">
                 </div>
-                <div>
-                    @php
-                        $currentOperationalDays = old('operational_days', $stay->operational_days);
-                        $selectedDaysOption = old('operational_days_option', $currentOperationalDays === 'setiap hari' ? 'setiap hari' : (!empty($currentOperationalDays) ? 'hari tertentu' : ''));
-                        $daysCustomValue = old('operational_days_custom', $selectedDaysOption === 'hari tertentu' ? $currentOperationalDays : '');
-                    @endphp
-                    <label>Hari Operasional</label>
-                    <select name="operational_days_option" id="days_option_stay">
-                        <option value="">-- Pilih --</option>
-                        <option value="setiap hari" {{ $selectedDaysOption === 'setiap hari' ? 'selected' : '' }}>Setiap Hari</option>
-                        <option value="hari tertentu" {{ $selectedDaysOption === 'hari tertentu' ? 'selected' : '' }}>Hari Tertentu</option>
-                    </select>
-                    <input id="days_custom_stay" type="text" name="operational_days_custom" placeholder="Contoh: Senin - Jumat" value="{{ $daysCustomValue }}" style="margin-top:8px; display:none;">
-                </div>
-                <div>
-                    @php
-                        $currentOperationalHours = old('operational_hours', $stay->operational_hours);
-                        $selectedHoursOption = old('operational_hours_option', $currentOperationalHours === '24 jam' ? '24 jam' : (!empty($currentOperationalHours) ? 'jam tertentu' : ''));
-                        $hoursCustomValue = old('operational_hours_custom', $selectedHoursOption === 'jam tertentu' ? $currentOperationalHours : '');
-                    @endphp
-                    <label>Jam Operasional</label>
-                    <select name="operational_hours_option" id="hours_option_stay">
-                        <option value="">-- Pilih --</option>
-                        <option value="24 jam" {{ $selectedHoursOption === '24 jam' ? 'selected' : '' }}>24 Jam</option>
-                        <option value="jam tertentu" {{ $selectedHoursOption === 'jam tertentu' ? 'selected' : '' }}>Jam Tertentu</option>
-                    </select>
-                    <input id="hours_custom_stay" type="text" name="operational_hours_custom" placeholder="Contoh: 14:00 - 12:00" value="{{ $hoursCustomValue }}" style="margin-top:8px; display:none;">
-                </div>
-                <div>
+                @include('admin.partials.operational-schedule-form', ['model' => $stay, 'idPrefix' => 'stay'])
+                <div class="field-card">
                     @php
                         $currentPrice = old('price', $stay->price);
                         $selectedPriceOption = old('price_option', ((float) $currentPrice) <= 0 ? 'gratis' : 'berbayar');
@@ -109,35 +165,32 @@
                     </select>
                     <input id="price_custom_stay" type="number" step="0.01" min="0" name="price_custom" placeholder="Masukkan harga" value="{{ $priceCustomValue }}" style="margin-top:8px; display:none;">
                 </div>
-                <div>
+                <div class="field-card full">
                     <label>Foto (Upload)</label>
                     <input type="file" name="image_file" accept="image/*">
-                    @if(!empty($stay->image_url))
-                        <div style="margin-top:8px; font-size:12px; color:#555;">Foto saat ini:</div>
-                        <img src="{{ asset('storage/' . $stay->image_url) }}" alt="Foto Penginapan" style="max-width:220px; margin-top:6px; border-radius:6px;">
-                    @endif
+                    <div class="helper-text">Upload foto baru jika ingin mengganti gambar utama penginapan.</div>
                 </div>
-                <div class="full">
+                <div class="field-card full">
                     <label>Transport ke Lokasi</label>
                     @php
                         $selectedTransport = old('transport_modes', $stay->transport_modes ?? []);
                     @endphp
-                    <div style="display:flex; gap:16px; flex-wrap:wrap;">
-                        <label style="font-weight:500;"><input type="checkbox" name="transport_modes[]" value="mobil" {{ in_array('mobil', $selectedTransport ?? []) ? 'checked' : '' }}> Mobil</label>
-                        <label style="font-weight:500;"><input type="checkbox" name="transport_modes[]" value="motor" {{ in_array('motor', $selectedTransport ?? []) ? 'checked' : '' }}> Motor</label>
-                        <label style="font-weight:500;"><input type="checkbox" name="transport_modes[]" value="jalan kaki" {{ in_array('jalan kaki', $selectedTransport ?? []) ? 'checked' : '' }}> Jalan Kaki</label>
-                        <label style="font-weight:500;"><input type="checkbox" name="transport_modes[]" value="bus" {{ in_array('bus', $selectedTransport ?? []) ? 'checked' : '' }}> Bus</label>
-                        <label style="font-weight:500;"><input type="checkbox" name="transport_modes[]" value="kapal" {{ in_array('kapal', $selectedTransport ?? []) ? 'checked' : '' }}> Kapal</label>
+                    <div class="checkbox-grid">
+                        <label><input type="checkbox" name="transport_modes[]" value="mobil" {{ in_array('mobil', $selectedTransport ?? []) ? 'checked' : '' }}> Mobil</label>
+                        <label><input type="checkbox" name="transport_modes[]" value="motor" {{ in_array('motor', $selectedTransport ?? []) ? 'checked' : '' }}> Motor</label>
+                        <label><input type="checkbox" name="transport_modes[]" value="jalan kaki" {{ in_array('jalan kaki', $selectedTransport ?? []) ? 'checked' : '' }}> Jalan Kaki</label>
+                        <label><input type="checkbox" name="transport_modes[]" value="bus" {{ in_array('bus', $selectedTransport ?? []) ? 'checked' : '' }}> Bus</label>
+                        <label><input type="checkbox" name="transport_modes[]" value="kapal" {{ in_array('kapal', $selectedTransport ?? []) ? 'checked' : '' }}> Kapal</label>
                     </div>
                 </div>
-                <div class="full">
+                <div class="field-card full">
                     <label>Status Lokasi</label>
                     <select name="status_lokasi" required>
                         <option value="terkenal" {{ old('status_lokasi', $stay->status_lokasi) === 'terkenal' ? 'selected' : '' }}>terkenal</option>
                         <option value="hidden gem" {{ old('status_lokasi', $stay->status_lokasi) === 'hidden gem' ? 'selected' : '' }}>hidden gem</option>
                     </select>
                 </div>
-                <div class="full">
+                <div class="field-card full">
                     <label>Amenities</label>
                     @php
                         $amenityOptions = [
@@ -166,11 +219,11 @@
                         @endforeach
                     </div>
                 </div>
-                <div class="full">
+                <div class="field-card full">
                     <label>Deskripsi</label>
                     <textarea name="description">{{ old('description', $stay->description) }}</textarea>
                 </div>
-            </div>
+                </div>
 
             <div class="actions">
                 <button class="btn btn-save" type="submit">Simpan</button>
@@ -180,12 +233,12 @@
     </div>
     <script>
         (function () {
-            const daysOption = document.getElementById('days_option_stay');
-            const daysCustom = document.getElementById('days_custom_stay');
-            const hoursOption = document.getElementById('hours_option_stay');
-            const hoursCustom = document.getElementById('hours_custom_stay');
             const priceOption = document.getElementById('price_option_stay');
             const priceCustom = document.getElementById('price_custom_stay');
+
+            function refreshVisibility() {
+                toggleField(priceOption, priceCustom, 'berbayar');
+            }
 
             function toggleField(selectEl, inputEl, expectedValue) {
                 if (!selectEl || !inputEl) {
@@ -193,15 +246,6 @@
                 }
                 inputEl.style.display = selectEl.value === expectedValue ? 'block' : 'none';
             }
-
-            function refreshVisibility() {
-                toggleField(daysOption, daysCustom, 'hari tertentu');
-                toggleField(hoursOption, hoursCustom, 'jam tertentu');
-                toggleField(priceOption, priceCustom, 'berbayar');
-            }
-
-            daysOption?.addEventListener('change', refreshVisibility);
-            hoursOption?.addEventListener('change', refreshVisibility);
             priceOption?.addEventListener('change', refreshVisibility);
             refreshVisibility();
         })();

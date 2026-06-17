@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -314,7 +314,7 @@
                 <a href="{{ route('admin.dashboard') }}">Home</a>
                 <a href="{{ route('admin.places.index') }}" class="active">Manage Tempat</a>
                 <a href="{{ route('admin.comments.index') }}">Manage Komentar</a>
-                <a href="{{ route('admin.users.index') }}">Manage User</a>
+                <a href="{{ route('admin.users.index') }}">Manage Member</a>
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
                     <button type="submit">Logout</button>
@@ -380,7 +380,7 @@
                                     <td class="price">{{ (float) $destination->price <= 0 ? 'Gratis' : 'Rp ' . number_format($destination->price, 0, ',', '.') }}</td>
                                     <td>
                                         @if($destination->user_rating_avg)
-                                            ⭐ {{ number_format($destination->user_rating_avg, 2) }} ({{ $destination->ratings_count }})
+                                            * {{ number_format($destination->user_rating_avg, 2) }} ({{ $destination->ratings_count }})
                                         @else
                                             -
                                         @endif
@@ -441,7 +441,7 @@
                                     <td class="price">{{ (float) $item->price <= 0 ? 'Gratis' : 'Rp ' . number_format($item->price, 0, ',', '.') }}</td>
                                     <td>
                                         @if($item->user_rating_avg)
-                                            ⭐ {{ number_format($item->user_rating_avg, 2) }} ({{ $item->ratings_count }})
+                                            * {{ number_format($item->user_rating_avg, 2) }} ({{ $item->ratings_count }})
                                         @else
                                             -
                                         @endif
@@ -502,7 +502,7 @@
                                     <td class="price">{{ (float) $stay->price <= 0 ? 'Gratis' : 'Rp ' . number_format($stay->price, 0, ',', '.') }}</td>
                                     <td>
                                         @if($stay->user_rating_avg)
-                                            ⭐ {{ number_format($stay->user_rating_avg, 2) }} ({{ $stay->ratings_count }})
+                                            * {{ number_format($stay->user_rating_avg, 2) }} ({{ $stay->ratings_count }})
                                         @else
                                             -
                                         @endif

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -149,7 +149,7 @@
             <div class="chips">
                 <span class="chip">Kategori: {{ $culinary->cuisine_type ?: '-' }}</span>
                 <span class="chip">Harga: {{ $culinary->price }}</span>
-                <span class="chip">Rating User: {{ $avgRating ? number_format($avgRating, 2) : '-' }}</span>
+                <span class="chip">Rating Member: {{ $avgRating ? number_format($avgRating, 2) : '-' }}</span>
             </div>
 
             <div style="margin-bottom:14px;">
@@ -170,8 +170,7 @@
             <div class="panel">
                 <h3>Informasi Kuliner</h3>
                 <div class="row"><div class="label">Alamat</div><div class="value">{{ $culinary->place_address ?: '-' }}, {{ $culinary->city ?: '-' }}, {{ $culinary->province ?: '-' }}</div></div>
-                <div class="row"><div class="label">Hari Operasional</div><div class="value">{{ $culinary->operational_days ?: '-' }}</div></div>
-                <div class="row"><div class="label">Jam Operasional</div><div class="value">{{ $culinary->operational_hours ?: '-' }}</div></div>
+                @include('partials.operational-schedule-display', ['model' => $culinary])
                 <div class="row"><div class="label">Transportasi</div><div class="value">{{ !empty($culinary->transport_modes) ? implode(', ', $culinary->transport_modes) : '-' }}</div></div>
                 <div class="row"><div class="label">Fasilitas</div><div class="value">{{ $culinary->amenities ?: '-' }}</div></div>
                 <div class="row"><div class="label">Deskripsi</div><div class="value">{{ $culinary->description ?: '-' }}</div></div>
@@ -197,7 +196,7 @@
         </div>
     </div>
 
-    <a class="back" href="{{ route('explore.culinaries') }}">← Kembali ke daftar</a>
+    <a class="back" href="{{ route('explore.culinaries') }}"><- Kembali ke daftar</a>
 </div>
 </body>
 </html>

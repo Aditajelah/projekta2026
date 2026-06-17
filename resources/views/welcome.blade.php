@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -459,49 +459,49 @@
             </article>
             <article class="feature">
                 <h3>Siap dipakai tim admin</h3>
-                <p>Konten mudah dikelola lewat dashboard admin terpisah tanpa mengganggu pengalaman user.</p>
+                <p>Konten mudah dikelola lewat dashboard admin terpisah tanpa mengganggu pengalaman member.</p>
             </article>
         </section>
 
         <section class="top-rated">
-            <h2>Top Rated by Users</h2>
+            <h2>Top Rated by Members</h2>
             <div class="top-grid">
                 <article class="top-card">
-                    <h3>📍 Destinasi</h3>
+                    <h3>Destinasi</h3>
                     @if(isset($topDestinations) && $topDestinations->count() > 0)
                         <ul>
                             @foreach($topDestinations as $item)
-                                <li>{{ $item->name }} - ⭐ {{ number_format($item->user_rating_avg, 2) }} ({{ $item->ratings_count }} rating)</li>
+                                <li>{{ $item->name }} - * {{ number_format($item->user_rating_avg, 2) }} ({{ $item->ratings_count }} rating)</li>
                             @endforeach
                         </ul>
                     @else
-                        <p class="empty-note">Belum ada rating dari user.</p>
+                        <p class="empty-note">Belum ada rating dari member.</p>
                     @endif
                 </article>
 
                 <article class="top-card">
-                    <h3>🍽️ Kuliner</h3>
+                    <h3>Kuliner</h3>
                     @if(isset($topCulinaries) && $topCulinaries->count() > 0)
                         <ul>
                             @foreach($topCulinaries as $item)
-                                <li>{{ $item->name }} - ⭐ {{ number_format($item->user_rating_avg, 2) }} ({{ $item->ratings_count }} rating)</li>
+                                <li>{{ $item->name }} - * {{ number_format($item->user_rating_avg, 2) }} ({{ $item->ratings_count }} rating)</li>
                             @endforeach
                         </ul>
                     @else
-                        <p class="empty-note">Belum ada rating dari user.</p>
+                        <p class="empty-note">Belum ada rating dari member.</p>
                     @endif
                 </article>
 
                 <article class="top-card">
-                    <h3>🏨 Penginapan</h3>
+                    <h3>Penginapan</h3>
                     @if(isset($topStays) && $topStays->count() > 0)
                         <ul>
                             @foreach($topStays as $item)
-                                <li>{{ $item->name }} - ⭐ {{ number_format($item->user_rating_avg, 2) }} ({{ $item->ratings_count }} rating)</li>
+                                <li>{{ $item->name }} - * {{ number_format($item->user_rating_avg, 2) }} ({{ $item->ratings_count }} rating)</li>
                             @endforeach
                         </ul>
                     @else
-                        <p class="empty-note">Belum ada rating dari user.</p>
+                        <p class="empty-note">Belum ada rating dari member.</p>
                     @endif
                 </article>
             </div>

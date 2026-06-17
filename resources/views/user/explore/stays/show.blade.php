@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -149,7 +149,7 @@
             <div class="chips">
                 <span class="chip">Harga: {{ $stay->price }}</span>
                 <span class="chip">Fasilitas: {{ $stay->amenities ?: '-' }}</span>
-                <span class="chip">Rating User: {{ $avgRating ? number_format($avgRating, 2) : '-' }}</span>
+                <span class="chip">Rating Member: {{ $avgRating ? number_format($avgRating, 2) : '-' }}</span>
             </div>
 
             <div style="margin-bottom:14px;">
@@ -170,8 +170,7 @@
             <div class="panel">
                 <h3>Informasi Penginapan</h3>
                 <div class="row"><div class="label">Alamat</div><div class="value">{{ $stay->place_address ?: '-' }}, {{ $stay->city ?: '-' }}, {{ $stay->province ?: '-' }}</div></div>
-                <div class="row"><div class="label">Hari Operasional</div><div class="value">{{ $stay->operational_days ?: '-' }}</div></div>
-                <div class="row"><div class="label">Jam Operasional</div><div class="value">{{ $stay->operational_hours ?: '-' }}</div></div>
+                @include('partials.operational-schedule-display', ['model' => $stay])
                 <div class="row"><div class="label">Transportasi</div><div class="value">{{ !empty($stay->transport_modes) ? implode(', ', $stay->transport_modes) : '-' }}</div></div>
                 <div class="row"><div class="label">Deskripsi</div><div class="value">{{ $stay->description ?: '-' }}</div></div>
             </div>
@@ -196,7 +195,7 @@
         </div>
     </div>
 
-    <a class="back" href="{{ route('explore.stays') }}">← Kembali ke daftar</a>
+    <a class="back" href="{{ route('explore.stays') }}"><- Kembali ke daftar</a>
 </div>
 </body>
 </html>

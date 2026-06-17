@@ -7,6 +7,7 @@ use App\Models\Culinary;
 use App\Models\Destination;
 use App\Models\Rating;
 use App\Models\Stay;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -14,17 +15,93 @@ use Illuminate\Validation\Rule;
 
 class AdminDataController extends Controller
 {
+    // Batas maksimum surat peringatan untuk moderasi komentar member.
+    private const MAX_WARNING_COUNT = 3;
+
+    // Daftar hari yang dipakai untuk normalisasi jadwal operasional mingguan.
+    private const WEEK_DAYS = [
+        'senin' => 'Senin',
+        'selasa' => 'Selasa',
+        'rabu' => 'Rabu',
+        'kamis' => 'Kamis',
+        'jumat' => 'Jumat',
+        'sabtu' => 'Sabtu',
+        'minggu' => 'Minggu',
+    ];
+
+    /**
+     * Menampilkan daftar komentar member untuk kebutuhan moderasi admin.
+     */
     public function comments()
     {
+        $this->ensureAdmin();
+
         $comments = Rating::with(['user', 'rateable'])
             ->whereNotNull('review')
             ->where('review', '!=', '')
             ->latest()
             ->paginate(25);
 
-        return view('admin.comments.index', compact('comments'));
+        return view('admin.comments.index', [
+            'comments' => $comments,
+            'maxWarningCount' => self::MAX_WARNING_COUNT,
+        ]);
     }
 
+    /**
+     * Menghapus komentar dan mencatat perubahan ke audit log.
+     */
+    public function destroyComment(Rating $comment)
+    {
+        $this->ensureAdmin();
+
+        $before = $comment->toArray();
+        $commentId = $comment->getKey();
+
+        $comment->delete();
+
+        $this->writeAuditLog('delete', 'comments', $commentId, $before, null);
+
+        return redirect()
+            ->route('admin.comments.index')
+            ->with('success', 'Komentar berhasil dihapus.');
+    }
+
+    /**
+     * Mengirim surat peringatan ke pemilik komentar yang melanggar.
+     */
+    public function sendWarning(Rating $comment)
+    {
+        $this->ensureAdmin();
+
+        $user = $comment->user;
+
+        if (!$user instanceof User) {
+            return redirect()
+                ->route('admin.comments.index')
+                ->withErrors(['warning' => 'Member untuk komentar ini tidak ditemukan.']);
+        }
+
+        if ($user->warning_count >= self::MAX_WARNING_COUNT) {
+            return redirect()
+                ->route('admin.comments.index')
+                ->withErrors(['warning' => 'Member sudah mencapai batas maksimal 3 surat peringatan.']);
+        }
+
+        $before = $user->toArray();
+        $user->increment('warning_count');
+        $user->refresh();
+
+        $this->writeAuditLog('update', 'user_warnings', $user->getKey(), $before, $user->toArray());
+
+        return redirect()
+            ->route('admin.comments.index')
+            ->with('success', 'Surat peringatan berhasil dikirim ke member. Total peringatan: ' . $user->warning_count . '/3.');
+    }
+
+    /**
+     * Menampilkan histori audit perubahan data oleh admin.
+     */
     public function logs()
     {
         $logs = AuditLog::with('user')->latest('changed_at')->paginate(25);
@@ -390,6 +467,9 @@ class AdminDataController extends Controller
         return redirect()->route('admin.dashboard')->with('success', 'Data penginapan berhasil dihapus.');
     }
 
+    /**
+     * Menyimpan rekam jejak perubahan entity ke tabel audit log.
+     */
     private function writeAuditLog(string $action, string $entityType, int $entityId, ?array $beforeData, ?array $afterData): void
     {
         AuditLog::create([
@@ -417,8 +497,60 @@ class AdminDataController extends Controller
         return $request->file('image_file')->store('uploads', 'public');
     }
 
+    /**
+     * Menormalisasi input jadwal operasional harian ke format yang konsisten.
+     */
     private function applyOperationalSchedule(Request $request, array $validated): array
     {
+        $weeklySchedule = $request->input('operational_schedule');
+
+        if (is_array($weeklySchedule) && !empty($weeklySchedule)) {
+            $normalizedSchedule = [];
+
+            foreach (self::WEEK_DAYS as $dayKey => $dayLabel) {
+                $dayInput = $weeklySchedule[$dayKey] ?? [];
+                $status = strtolower((string) ($dayInput['status'] ?? 'closed'));
+
+                if (!in_array($status, ['open', 'full_day', 'closed'], true)) {
+                    $status = 'closed';
+                }
+
+                $openTime = trim((string) ($dayInput['open_time'] ?? ''));
+                $closeTime = trim((string) ($dayInput['close_time'] ?? ''));
+
+                if ($status === 'full_day') {
+                    $openTime = '00:00';
+                    $closeTime = '23:59';
+                } elseif ($status !== 'open') {
+                    $openTime = '';
+                    $closeTime = '';
+                }
+
+                $normalizedSchedule[] = [
+                    'day' => $dayKey,
+                    'label' => $dayLabel,
+                    'status' => $status,
+                    'open_time' => $openTime,
+                    'close_time' => $closeTime,
+                ];
+            }
+
+            [$daysSummary, $hoursSummary] = $this->summarizeOperationalSchedule($normalizedSchedule);
+
+            $validated['operational_schedule'] = $normalizedSchedule;
+            $validated['operational_days'] = $daysSummary;
+            $validated['operational_hours'] = $hoursSummary;
+
+            unset(
+                $validated['operational_days_option'],
+                $validated['operational_days_custom'],
+                $validated['operational_hours_option'],
+                $validated['operational_hours_custom']
+            );
+
+            return $validated;
+        }
+
         $daysOption = $request->input('operational_days_option');
         $daysCustom = trim((string) $request->input('operational_days_custom', ''));
 
@@ -447,6 +579,58 @@ class AdminDataController extends Controller
         return $validated;
     }
 
+    /**
+     * Membuat ringkasan teks hari dan jam operasional dari struktur jadwal mingguan.
+     */
+    private function summarizeOperationalSchedule(array $schedule): array
+    {
+        $openDays = array_filter($schedule, static fn (array $row) => in_array(($row['status'] ?? 'closed'), ['open', 'full_day'], true));
+
+        if (empty($openDays)) {
+            return ['Libur setiap hari', 'Libur setiap hari'];
+        }
+
+        $allOpen = count($openDays) === count($schedule);
+        $sameHours = count(array_unique(array_map(
+            static fn (array $row) => ($row['open_time'] ?? '') . '-' . ($row['close_time'] ?? ''),
+            $openDays
+        ))) === 1;
+
+        if ($allOpen && $sameHours) {
+            $first = $openDays[array_key_first($openDays)];
+
+            return [
+                'Setiap hari',
+                ($first['status'] ?? 'open') === 'full_day'
+                    ? '24 jam'
+                    : trim(($first['open_time'] ?? '') . ' - ' . ($first['close_time'] ?? '')),
+            ];
+        }
+
+        $daysParts = [];
+        $hoursParts = [];
+
+        foreach ($schedule as $row) {
+            $label = $row['label'] ?? ucfirst((string) ($row['day'] ?? '-'));
+
+            if (($row['status'] ?? 'closed') === 'full_day') {
+                $daysParts[] = $label . ': 24 Jam';
+                $hoursParts[] = $label . ': 24 Jam';
+            } elseif (($row['status'] ?? 'closed') === 'open') {
+                $daysParts[] = $label . ': Buka';
+                $hoursParts[] = $label . ': ' . trim(($row['open_time'] ?? '') . ' - ' . ($row['close_time'] ?? ''));
+            } else {
+                $daysParts[] = $label . ': Libur';
+                $hoursParts[] = $label . ': Libur';
+            }
+        }
+
+        return [implode(', ', $daysParts), implode(', ', $hoursParts)];
+    }
+
+    /**
+     * Membersihkan daftar fasilitas agar tersimpan rapi sebagai teks terpisah koma.
+     */
     private function normalizeAmenities(array $amenities): ?string
     {
         $cleaned = array_values(array_filter(array_map(static fn ($item) => trim((string) $item), $amenities)));
@@ -454,6 +638,9 @@ class AdminDataController extends Controller
         return empty($cleaned) ? null : implode(', ', $cleaned);
     }
 
+    /**
+     * Mengubah pilihan harga gratis/berbayar menjadi nilai numerik final.
+     */
     private function applyPriceOption(Request $request, array $validated): array
     {
         $priceOption = $request->input('price_option');
@@ -477,6 +664,16 @@ class AdminDataController extends Controller
     {
         if (!empty($path) && Storage::disk('public')->exists($path)) {
             Storage::disk('public')->delete($path);
+        }
+    }
+
+    /**
+     * Guard endpoint agar hanya role admin yang dapat mengakses fitur ini.
+     */
+    private function ensureAdmin(): void
+    {
+        if (!Auth::check() || Auth::user()->role !== 'admin') {
+            abort(403, 'Hanya admin yang dapat mengakses halaman ini.');
         }
     }
 }

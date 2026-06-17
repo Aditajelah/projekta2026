@@ -116,6 +116,57 @@
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+
+        .cs-help {
+            margin-top: 16px;
+            background: #fff8e6;
+            border: 1px solid #f2d49b;
+            color: #6f4e17;
+            padding: 14px;
+            border-radius: 8px;
+        }
+
+        .cs-help p {
+            margin-bottom: 10px;
+            font-size: 14px;
+            line-height: 1.45;
+        }
+
+        .cs-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .cs-btn {
+            display: inline-block;
+            text-decoration: none;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .cs-btn-page {
+            background: #7c4d00;
+            color: #fff;
+        }
+
+        .cs-btn-email {
+            background: #fff;
+            color: #7c4d00;
+            border: 1px solid #7c4d00;
+        }
+
+        .cs-email {
+            font-size: 13px;
+            color: #6f4e17;
+            background: #fff;
+            border: 1px dashed #d8b16a;
+            padding: 8px 10px;
+            border-radius: 6px;
+        }
     </style>
 </head>
 <body>
@@ -127,6 +178,18 @@
                 @foreach ($errors->all() as $error)
                     <div>{{ $error }}</div>
                 @endforeach
+            </div>
+        @endif
+
+        @if (session('inactive_account'))
+            <div class="cs-help">
+                <p>
+                    Akun Anda sedang nonaktif. Jika ini tidak sesuai, silakan hubungi Customer Service untuk proses verifikasi ulang akun.
+                </p>
+                <div class="cs-links">
+                    <a href="{{ route('customer-service') }}" class="cs-btn cs-btn-page">Buka Customer Service</a>
+                    <span class="cs-email">Email CS: adityokaylanfiros@gmail.com</span>
+                </div>
             </div>
         @endif
 

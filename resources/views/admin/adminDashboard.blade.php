@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -284,7 +284,8 @@
                 <a href="{{ route('admin.dashboard') }}" class="active">Home</a>
                 <a href="{{ route('admin.places.index') }}">Manage Tempat</a>
                 <a href="{{ route('admin.comments.index') }}">Manage Komentar</a>
-                <a href="{{ route('admin.users.index') }}">Manage User</a>
+                <a href="{{ route('admin.users.index') }}">Manage Member</a>
+                <a href="{{ route('admin.logs') }}">Admin Logs</a>
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
                     <button type="submit">Logout</button>
@@ -309,6 +310,16 @@
                 </div>
 
                 <p class="summary-note">Ringkasan total data pada sistem.</p>
+
+                <div class="section-block">
+                    <div class="section-heading">
+                        <div>
+                            <h2>Admin Logs</h2>
+                            <p>Lihat riwayat perubahan data, termasuk status akun member dan alasan penonaktifan.</p>
+                        </div>
+                        <a href="{{ route('admin.logs') }}" class="best-link">Buka Log</a>
+                    </div>
+                </div>
 
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -349,7 +360,7 @@
                                     </div>
 
                                     <div>
-                                        <div class="best-rating">⭐ {{ number_format($place['rating'], 2) }}</div>
+                                        <div class="best-rating">* {{ number_format($place['rating'], 2) }}</div>
                                         <div class="best-meta">{{ $place['comments_count'] }} komentar</div>
                                     </div>
 
